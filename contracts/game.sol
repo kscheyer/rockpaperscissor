@@ -118,20 +118,17 @@ contract game{
     internal    
     returns (address)
     {
-        if (evulationMapping[GetPlayerMove(gameHash, Players.player1)][GetPlayerMove(gameHash, Players.player2)] == EvalState.win)
-        {
+        if (evulationMapping
+        [GetPlayerMove(gameHash, Players.player1)]
+        [GetPlayerMove(gameHash, Players.player2)] == EvalState.win)
             moneys[p1Address] += games[gameHash].wager * 2;
-        }
-        else if (evulationMapping[GetPlayerMove(gameHash, Players.player1)][GetPlayerMove(gameHash, Players.player2)] == EvalState.lose)
-        {
+        else if (evulationMapping
+        [GetPlayerMove(gameHash, Players.player1)]
+        [GetPlayerMove(gameHash, Players.player2)] == EvalState.lose)
             moneys[p2Address] += games[gameHash].wager * 2;
-        }
-        else
-        {
-            moneys[p1Address] += (games[gameHash].wager * 9)/100;
-            moneys[p2Address] += (games[gameHash].wager * 9)/100;
-        }
-            
+
+        moneys[p1Address] += (games[gameHash].wager * 9)/100;
+        moneys[p2Address] += (games[gameHash].wager * 9)/100;
     }
     
     function GetPlayerMove(bytes32 gameHash, Players player)
