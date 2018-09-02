@@ -1,6 +1,6 @@
 pragma solidity 0.4.24;
 
-contract game{test
+contract game{
     
     struct Game {
         uint wager;
