@@ -15,7 +15,7 @@ contract game{
     mapping(bytes32 => Game) public games;
     mapping(address => uint) public moneys;
     mapping(bytes32 => mapping(bytes32 => EvalState)) public evulationMapping;
-    address owner;
+    address public owner;
     
     constructor()
     {

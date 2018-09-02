@@ -15,9 +15,10 @@ contract game{
     mapping(bytes32 => Game) public games;
     mapping(address => uint) public moneys;
     mapping(bytes32 => mapping(bytes32 => EvalState)) public evulationMapping;
-    address owner;
+    address public owner;
     
     constructor()
+    public
     {
         owner = msg.sender;
         
@@ -118,17 +119,20 @@ contract game{
     internal    
     returns (address)
     {
-        if (evulationMapping
-        [GetPlayerMove(gameHash, Players.player1)]
-        [GetPlayerMove(gameHash, Players.player2)] == EvalState.win)
+        if (evulationMapping[GetPlayerMove(gameHash, Players.player1)][GetPlayerMove(gameHash, Players.player2)] == EvalState.win)
+        {
             moneys[p1Address] += games[gameHash].wager * 2;
-        else if (evulationMapping
-        [GetPlayerMove(gameHash, Players.player1)]
-        [GetPlayerMove(gameHash, Players.player2)] == EvalState.lose)
+        }
+        else if (evulationMapping[GetPlayerMove(gameHash, Players.player1)][GetPlayerMove(gameHash, Players.player2)] == EvalState.lose)
+        {
             moneys[p2Address] += games[gameHash].wager * 2;
-
-        moneys[p1Address] += (games[gameHash].wager * 9)/100;
-        moneys[p2Address] += (games[gameHash].wager * 9)/100;
+        }
+        else
+        {
+            moneys[p1Address] += (games[gameHash].wager * 9)/100;
+            moneys[p2Address] += (games[gameHash].wager * 9)/100;
+        }
+            
     }
     
     function GetPlayerMove(bytes32 gameHash, Players player)
@@ -154,10 +158,18 @@ contract game{
     }
     
     function getPairHash(address _a, address _b)
-    internal
+    public
     pure
     returns (bytes32){
         return (_a < _b) ? keccak256(abi.encodePacked(_a, _b)) :  keccak256(abi.encodePacked(_b, _a));
+    }
+
+    function getSecretMove(string _move, string _movePassword)
+    public
+    pure
+    returns (bytes32)
+    {
+        return keccak256(abi.encodePacked(_move, _movePassword));
     }
     
     function ()
