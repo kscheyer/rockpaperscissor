@@ -10,7 +10,12 @@ contract('testing rockpaperscissors', async (accounts) => {
 	let game;
 
 	let player1 = accounts[1];
+	let player1Move = 'Paper';
+	let player1Password = '123';
+
 	let player2 = accounts[2];
+	let player2Move = 'Rock';
+	let player2Password = '456';
 
 	it('deploy rockpaperscissors', async() => {
 		game = await Game.new();
@@ -35,7 +40,7 @@ contract('testing rockpaperscissors', async (accounts) => {
 	});
 
 	it('player 1 plays', async() => {
-		let secretMove = await game.GetHashedMove('Paper', '123');
+		let secretMove = await game.GetHashedMove(player1Move, player1Password);
 
 		await game.play(player2, secretMove, {from: player1});
 		let pairHash = await game.getPairHash(player1, player2);
@@ -44,7 +49,7 @@ contract('testing rockpaperscissors', async (accounts) => {
 	});
 
 	it('player 2 plays', async() => {
-		let secretMove = await game.GetHashedMove('Paper', '123');
+		let secretMove = await game.GetHashedMove(player2Move, player2Password);
 		
 		await game.play(player1, secretMove, {from: player2});
 		let pairHash = await game.getPairHash(player1, player2);
@@ -52,6 +57,24 @@ contract('testing rockpaperscissors', async (accounts) => {
 		assert.equal(gameStateCheck[1], 3);
 	});
 
-	
+	it('player 1 finalizes move', async() => {
+		let pairHash = await game.getPairHash(player1, player2);
+		let gameStateCheck = await game.games(pairHash);
+
+		await game.finalizeMove(player2, player1Move, player1Password, {from: player1});
+
+		assert.equal(gameStateCheck[1], 4);
+		assert.equal(gameStateCheck[2][player1], keccak256(abi.encodePacked(player1Move)));
+	});
+
+	it ('player 2 finalizes move', async() => {
+		let pairHash = await game.getPairHash(player1, player2);
+		let gameStateCheck = await game.games(pairHash);
+
+		await game.finalizeMove(player2, player1Move, player1Password, {from: player1});
+
+		assert.equal(gameStateCheck[1], 0);
+		assert.equal(gameStateCheck[2][player2], keccak256(abi.encodePacked(player2Move)));
+	})
 });
 
