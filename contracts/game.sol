@@ -88,13 +88,13 @@ contract game{
         if (opponent > msg.sender) // Player1
         {
             require(verifiedMove == GetPlayerMove(gameHash, Players.player1));
-            Evaluate(gameHash, Players.player1, move, opponent, msg.sender);
+            require(Evaluate(gameHash, Players.player1, move, msg.sender, opponent));            
             
         }
         else // Player2
-        {
+        {            
             require(verifiedMove == GetPlayerMove(gameHash, Players.player2));
-            Evaluate(gameHash, Players.player2, move, msg.sender, opponent);
+            require(Evaluate(gameHash, Players.player2, move, opponent, msg.sender));
         }
     }
 
@@ -108,6 +108,7 @@ contract game{
     
     function Evaluate(bytes32 gameHash, Players player, string move, address p1Address, address p2Address)
     internal
+    returns (bool)
     {
             SetPlayerMove(gameHash, player, keccak256(abi.encodePacked(move)));
                 
@@ -120,6 +121,8 @@ contract game{
                 Payout(gameHash, p1Address, p2Address);
                 games[gameHash].state = GameState.ready;
             }
+            assert(games[gameHash].state != GameState.playing);
+            return true;
     }
     
     function Payout(bytes32 gameHash, address p1Address, address p2Address)
@@ -135,14 +138,14 @@ contract game{
         }
         else
         {
-            moneys[p1Address] += (games[gameHash].wager * 9)/100;
-            moneys[p2Address] += (games[gameHash].wager * 9)/100;
+            moneys[p1Address] += (games[gameHash].wager * 90)/100;
+            moneys[p2Address] += (games[gameHash].wager * 90)/100;
         }
             
     }
     
     function GetPlayerMove(bytes32 gameHash, Players player)
-    internal
+    public
     view
     returns (bytes32)
     {
@@ -154,13 +157,21 @@ contract game{
     {
         games[gameHash].playerMove[uint(player)] = move;
     }
-    
-    function GetHashedMove(string move, string movePassword)
+
+    function GetHash(string s1)
     external
     pure
     returns (bytes32)
     {
-        return keccak256(abi.encodePacked(move, movePassword));
+        return keccak256(abi.encodePacked(s1));
+    }
+
+    function GetHash(string s1, string s2)
+    external
+    pure
+    returns (bytes32)
+    {
+        return keccak256(abi.encodePacked(s1, s2));
     }
     
     function getPairHash(address _a, address _b)

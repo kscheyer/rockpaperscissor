@@ -28,7 +28,6 @@ contract('testing rockpaperscissors', async (accounts) => {
 		let gameStateCheck = await game.games(pairHash);
 		assert.equal(gameStateCheck[0], wager);
 		assert.equal(gameStateCheck[1], 1);
-		console.log(gameStateCheck);
 	});
 
 	it('accept challenge', async() =>{
@@ -40,7 +39,7 @@ contract('testing rockpaperscissors', async (accounts) => {
 	});
 
 	it('player 1 plays', async() => {
-		let secretMove = await game.GetHashedMove(player1Move, player1Password);
+		let secretMove = await game.GetHash(player1Move, player1Password);
 
 		await game.play(player2, secretMove, {from: player1});
 		let pairHash = await game.getPairHash(player1, player2);
@@ -49,7 +48,7 @@ contract('testing rockpaperscissors', async (accounts) => {
 	});
 
 	it('player 2 plays', async() => {
-		let secretMove = await game.GetHashedMove(player2Move, player2Password);
+		let secretMove = await game.GetHash(player2Move, player2Password);
 		
 		await game.play(player1, secretMove, {from: player2});
 		let pairHash = await game.getPairHash(player1, player2);
@@ -58,24 +57,22 @@ contract('testing rockpaperscissors', async (accounts) => {
 	});
 
 	it('player 1 finalizes move', async() => {
+		await game.finalizeMove(player2, player1Move, player1Password, {from: player1});
+
 		let pairHash = await game.getPairHash(player1, player2);
 		let gameStateCheck = await game.games(pairHash);
 
-		await game.finalizeMove(player2, player1Move, player1Password, {from: player1});
-
-		console.log(gameStateCheck[1]);
 		assert.equal(gameStateCheck[1], 4);
-		assert.equal(gameStateCheck[2][player1], keccak256(abi.encodePacked(player1Move)));
 	});
 
 	it ('player 2 finalizes move', async() => {
+		await game.finalizeMove(player1, player2Move, player2Password, {from: player2});
+
 		let pairHash = await game.getPairHash(player1, player2);
 		let gameStateCheck = await game.games(pairHash);
 
-		await game.finalizeMove(player2, player1Move, player1Password, {from: player1});
-
 		assert.equal(gameStateCheck[1], 0);
-		assert.equal(gameStateCheck[2][player2], keccak256(abi.encodePacked(player2Move)));
+		assert.equal(await game.moneys(player1), wager * 2);
 	})
 });
 
