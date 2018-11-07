@@ -101,8 +101,9 @@ contract game{
     function cashOut()
     external
     {
-        msg.sender.tranfer(moneys[msg.sender]);
-        moneys[p1Address] = 0;
+        uint amount = moneys[msg.sender];
+        delete moneys[msg.sender];
+        msg.sender.transfer(amount);
     }
     
     function Evaluate(bytes32 gameHash, Players player, string move, address p1Address, address p2Address)
@@ -163,7 +164,7 @@ contract game{
     }
     
     function getPairHash(address _a, address _b)
-    internal
+    public
     pure
     returns (bytes32){
         return (_a < _b) ? keccak256(abi.encodePacked(_a, _b)) :  keccak256(abi.encodePacked(_b, _a));

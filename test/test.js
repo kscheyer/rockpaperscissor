@@ -63,6 +63,7 @@ contract('testing rockpaperscissors', async (accounts) => {
 
 		await game.finalizeMove(player2, player1Move, player1Password, {from: player1});
 
+		console.log(gameStateCheck[1]);
 		assert.equal(gameStateCheck[1], 4);
 		assert.equal(gameStateCheck[2][player1], keccak256(abi.encodePacked(player1Move)));
 	});
