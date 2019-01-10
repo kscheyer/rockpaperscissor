@@ -65,7 +65,7 @@ contract('testing rockpaperscissors', async (accounts) => {
 		assert.equal(gameStateCheck[1], 4);
 	});
 
-	it ('player 2 finalizes move', async() => {
+	it('player 2 finalizes move', async() => {
 		await game.finalizeMove(player1, player2Move, player2Password, {from: player2});
 
 		let pairHash = await game.getPairHash(player1, player2);
@@ -73,6 +73,12 @@ contract('testing rockpaperscissors', async (accounts) => {
 
 		assert.equal(gameStateCheck[1], 0);
 		assert.equal(await game.moneys(player1), wager * 2);
+	})
+
+	it('player 1 cashes out', async() => {
+		await game.cashOut({from: player1});
+
+		assert.equal(game.moneys(player1), null);
 	})
 });
 

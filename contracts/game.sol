@@ -18,6 +18,7 @@ contract game{
     address public owner;
     
     constructor()
+    public
     {
         owner = msg.sender;
         
